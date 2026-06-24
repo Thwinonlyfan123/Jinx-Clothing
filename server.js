@@ -33,8 +33,9 @@ app.use(session({
 }));
 
 // ================= ၄။ DATABASE CONNECTION =================
+// ➡️ ဒီကုဒ်တစ်ခုလုံးကို ကော်ပီကူးပြီး server.js က မူရင်း db နေရာမှာ အစားထိုးချပါ
 const db = mysql.createPool({
-    host: 'mysql-30d878ef-jinx-clothing.h.aivencloud.com', // လင့်ခ်ကို ဒီအတိုင်း အသေထည့်ပါ
+    host: 'mysql-30d878ef-jinx-clothing.h.aivencloud.com',
     port: 24609,
     user: 'avnadmin',
     password: 'AVNS_Z7UJT6yZhNc2_GkEfNS',
