@@ -39,7 +39,6 @@ const db = mysql.createPool({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-
     ssl: {
         rejectUnauthorized: false
     }
@@ -53,6 +52,7 @@ function isAdmin(req, res, next) {
 }
 
 // ================= ၆။ ROUTES =================
+app.get("/", (req, res) => { res.send("<h1>🚀 Server is Running Successfully on Railway!</h1>"); });
 app.get("/home", (req, res) => { res.render("home"); });
 app.get("/about", (req, res) => { res.render("about"); });
 app.get("/contact", (req, res) => { res.render("contact"); });
@@ -198,10 +198,8 @@ app.get("/admin/delete/:id", isAdmin, (req, res) => {
     });
 });
 
-// --- AUTHENTICATION & REGISTER WITH OTP ---
-
+// --- WEB AUTHENTICATION & REGISTER WITH OTP ---
 app.get("/register", (req, res) => { res.render("register", { error: null }); });
-
 app.post("/register", (req, res) => {
     const { name, email, password } = req.body;
 
@@ -210,7 +208,6 @@ app.post("/register", (req, res) => {
         if (result.length > 0) return res.render("register", { error: "ဒီ Email က သုံးပြီးသားပါ!" });
 
         const otpCode = Math.floor(100000 + Math.random() * 900000);
-
         const saveOtpSql = "INSERT INTO otp_table (email, code, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 5 MINUTE))";
         
         db.query(saveOtpSql, [email, otpCode], async (otpErr) => {
@@ -236,13 +233,11 @@ app.post("/register", (req, res) => {
 
                 const hashedPassword = await bcrypt.hash(password, 10);
                 req.session.tempUser = { name, email, password: hashedPassword };
-
                 res.redirect("/verify-otp"); 
             });
         });
     });
 });
-
 
 app.get("/verify-otp", (req, res) => {
     if (!req.session.tempUser) return res.redirect("/register");
@@ -266,11 +261,9 @@ app.post("/verify-otp", (req, res) => {
         if (userEnteredCode === correctCodeFromDB) {
             db.query("INSERT INTO users (name, email, password) VALUES (?, ?, ?)", [name, email, password], (insertErr) => {
                 if (insertErr) return res.render("verify", { error: "အကောင့်ဆောက်၍မရပါ၊ ထပ်မံကြိုးစားပါ။", email });
-
                 
                 delete req.session.tempUser;
                 db.query("DELETE FROM otp_table WHERE email = ?", [email]); 
-
                 res.redirect("/login"); 
             });
         } else {
@@ -279,8 +272,7 @@ app.post("/verify-otp", (req, res) => {
     });
 });
 
-// --- LOGIN & LOGOUT ---
-
+// --- WEB LOGIN & LOGOUT ---
 app.get("/login", (req, res) => { res.render("login", { error: null }); });
 app.post("/login", (req, res) => {
     const { email, password } = req.body;
@@ -301,9 +293,9 @@ app.post("/login", (req, res) => {
 
 app.get("/logout", (req, res) => { req.session.destroy(() => res.redirect("/login")); });
 
+// ================= ၇။ OTP SYSTEM API ROUTES (FOR POSTMAN & ANDROID STUDIO) =================
 
-// =================  - OTP SYSTEM API ROUTES (FOR POSTMAN TESTING) =================
-
+// Android မှတစ်ဆင့် Register လုပ်ရန် နှိပ်လျှင် OTP အရင်ပို့ပေးမည့် API
 app.post("/api/send-otp", (req, res) => {
     const { email } = req.body;
     const otpCode = Math.floor(100000 + Math.random() * 900000);
@@ -334,24 +326,49 @@ app.post("/api/send-otp", (req, res) => {
     });
 });
 
-app.post("/api/verify-otp", (req, res) => {
-    const { email, userEnteredCode } = req.body;
+// Android မှ ဖြည့်လိုက်သော OTP မှန်ကန်လျှင် User Table ထဲ တန်းသိမ်းပေးမည့် Register API
+app.post("/api/verify-otp-register", async (req, res) => {
+    const { name, email, password, userEnteredCode } = req.body;
 
     const checkOtpSql = "SELECT code FROM otp_table WHERE email = ? AND expires_at > NOW() ORDER BY id DESC LIMIT 1";
     
-    db.query(checkOtpSql, [email], (err, result) => {
+    db.query(checkOtpSql, [email], async (err, result) => {
         if (err) return res.status(500).json({ success: false, message: "Database Error" });
         if (result.length === 0) return res.status(400).json({ success: false, message: "OTP သက်တမ်းကုန်ဆုံးသွားပြီ သို့မဟုတ် မရှိပါ။" });
 
         if (userEnteredCode === result[0].code) {
-            res.json({ success: true, message: "အကောင့်အတည်ပြုခြင်း အောင်မြင်ပါသည်။" });
+            const hashedPassword = await bcrypt.hash(password, 10);
+            db.query("INSERT INTO users (name, email, password) VALUES (?, ?, ?)", [name, email, hashedPassword], (insertErr) => {
+                if (insertErr) return res.status(500).json({ success: false, message: "အကောင့်ဆောက်၍မရပါ၊ ထပ်မံကြိုးစားပါ။" });
+                
+                db.query("DELETE FROM otp_table WHERE email = ?", [email]); 
+                res.json({ success: true, message: "Android အကောင့်ဖွင့်ခြင်း အောင်မြင်ပါသည်။" });
+            });
         } else {
             res.status(400).json({ success: false, message: "အတည်ပြုကုဒ် မှားယွင်းနေပါသည်။" });
         }
     });
 });
 
+// Android Mobile App မှ လှမ်းဝင်ရန် Android Login API (JSON ပြန်ပေးမည်)
+app.post("/api/login", (req, res) => {
+    const { email, password } = req.body;
+    db.query("SELECT * FROM users WHERE email = ?", [email], async (err, result) => {
+        if (err) return res.status(500).json({ success: false, message: "Database Error" });
+        if (result.length === 0) return res.status(400).json({ success: false, message: "Email သို့မဟုတ် Password မှားနေပါတယ်။" });
+        
+        const user = result[0];
+        let isMatch = user.password.startsWith("$2b$") ? await bcrypt.compare(password, user.password) : (password === user.password);
 
-// ================= ၇။ SERVER START =================
+        if (isMatch) {
+            res.json({ success: true, message: "Login အောင်မြင်ပါသည်", user: { id: user.id, name: user.name, email: user.email } });
+        } else {
+            res.status(400).json({ success: false, message: "Email သို့မဟုတ် Password မှားနေပါတယ်။" });
+        }
+    });
+});
+
+
+// ================= ၈။ SERVER START =================
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => { console.log(`Server running on port ${PORT}`); });
