@@ -34,11 +34,11 @@ app.use(session({
 
 // ================= ၄။ DATABASE CONNECTION =================
 const db = mysql.createPool({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 24609,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD, // ဘာ Password မှ အသေမထည့်ပါနဲ့
-    database: process.env.DB_NAME,
+    host: 'mysql-30d878ef-jinx-clothing.h.aivencloud.com', // လင့်ခ်ကို ဒီအတိုင်း အသေထည့်ပါ
+    port: 24609,
+    user: 'avnadmin',
+    password: 'AVNS_Z7UJT6yZhNc2_GkEfNS',
+    database: 'defaultdb',
     ssl: {
         rejectUnauthorized: false
     },
