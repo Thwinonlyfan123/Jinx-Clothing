@@ -286,7 +286,7 @@ app.post("/verify-otp", (req, res) => {
 
         const correctCodeFromDB = result[0].code;
 
-        if (userEnteredCode === correctCodeFromDB) {
+        if (Number(userEnteredCode) === correctCodeFromDB) {
             db.query("INSERT INTO users (name, email, password) VALUES (?, ?, ?)", [name, email, password], (insertErr) => {
                 if (insertErr) return res.render("verify", { error: "အကောင့်ဆောက်၍မရပါ၊ ထပ်မံကြိုးစားပါ။", email });
                 
@@ -387,7 +387,7 @@ app.post("/api/verify-otp-register", async (req, res) => {
         if (err) return res.status(500).json({ success: false, message: "Database Error" });
         if (result.length === 0) return res.status(400).json({ success: false, message: "OTP သက်တမ်းကုန်ဆုံးသွားပြီ သို့မဟုတ် မရှိပါ။" });
 
-        if (userEnteredCode === result[0].code) {
+        if (Number(userEnteredCode) === result[0].code) {
             const hashedPassword = await bcrypt.hash(password, 10);
             db.query("INSERT INTO users (name, email, password) VALUES (?, ?, ?)", [name, email, hashedPassword], (insertErr) => {
                 if (insertErr) return res.status(500).json({ success: false, message: "အကောင့်ဆောက်၍မရပါ၊ ထပ်မံကြိုးစားပါ။" });
