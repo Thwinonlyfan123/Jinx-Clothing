@@ -199,19 +199,33 @@ app.get("/admin/delete/:id", isAdmin, (req, res) => {
 });
 
 // --- WEB AUTHENTICATION & REGISTER WITH OTP ---
-app.get("/register", (req, res) => { res.render("register", { error: null }); });
+app.get("/register", (req, res) => { 
+    res.render("register", { error: null }); 
+});
+
 app.post("/register", (req, res) => {
     const { name, email, password } = req.body;
 
-    db.query("SELECT email FROM users WHERE email = ?", [email], async (err, result) => {
-        if (err) return res.render("register", { error: "Database Error" });
-        if (result.length > 0) return res.render("register", { error: "ဒီ Email က သုံးပြီးသားပါ!" });
+    // ➡️ ပြင်ဆင်ချက်: result နေရာတွင် results အဖြစ်ပြောင်းလဲပြီး Error handling စနစ်တကျလုပ်ထားသည်
+    db.query("SELECT email FROM users WHERE email = ?", [email], async (err, results) => {
+        if (err) {
+            console.error("Database Error (SELECT):", err);
+            return res.render("register", { error: "Database Error တက်နေပါသည်။" });
+        }
+        
+        // mysql2 အတွက် results.length ကို စိတ်ချရအောင် စစ်ဆေးခြင်း
+        if (results && results.length > 0) {
+            return res.render("register", { error: "ဒီ Email က သုံးပြီးသားပါ!" });
+        }
 
         const otpCode = Math.floor(100000 + Math.random() * 900000);
         const saveOtpSql = "INSERT INTO otp_table (email, code, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 5 MINUTE))";
         
         db.query(saveOtpSql, [email, otpCode], async (otpErr) => {
-            if (otpErr) return res.render("register", { error: "OTP သိမ်းဆည်းမှု အမှားအယွင်းရှိပါသည်။" });
+            if (otpErr) {
+                console.error("Database Error (INSERT OTP):", otpErr);
+                return res.render("register", { error: "OTP သိမ်းဆည်းမှု အမှားအယွင်းရှိပါသည်။" });
+            }
 
             const transporter = nodemailer.createTransport({
                 service: "gmail",
@@ -229,11 +243,20 @@ app.post("/register", (req, res) => {
             };
 
             transporter.sendMail(mailOptions, async (mailErr) => {
-                if (mailErr) return res.render("register", { error: "Mail ပို့၍မရပါ။ Gmail setting ပြန်စစ်ပါ။" });
+                if (mailErr) {
+                    console.error("Mail Send Error:", mailErr);
+                    return res.render("register", { error: "Mail ပို့၍မရပါ။ Gmail setting ပြန်စစ်ပါ။" });
+                }
 
-                const hashedPassword = await bcrypt.hash(password, 10);
-                req.session.tempUser = { name, email, password: hashedPassword };
-                res.redirect("/verify-otp"); 
+                // OTP အောင်မြင်စွာ ထွက်သွားမှ Password ကို hash လုပ်ပြီး session ထဲသိမ်းမည်
+                try {
+                    const hashedPassword = await bcrypt.hash(password, 10);
+                    req.session.tempUser = { name, email, password: hashedPassword };
+                    res.redirect("/verify-otp"); 
+                } catch (hashErr) {
+                    console.error("Bcrypt Error:", hashErr);
+                    return res.render("register", { error: "Password ကာကွယ်မှု စနစ်ချို့ယွင်းချက်ရှိပါသည်။" });
+                }
             });
         });
     });
@@ -273,24 +296,47 @@ app.post("/verify-otp", (req, res) => {
 });
 
 // --- WEB LOGIN & LOGOUT ---
-app.get("/login", (req, res) => { res.render("login", { error: null }); });
+app.get("/login", (req, res) => { 
+    res.render("login", { error: null }); 
+});
+
 app.post("/login", (req, res) => {
     const { email, password } = req.body;
-    db.query("SELECT * FROM users WHERE email = ?", [email], async (err, result) => {
-        if (result.length === 0) return res.render("login", { error: "Email သို့မဟုတ် Password မှားနေပါတယ်။" });
-        const user = result[0];
-        let isMatch = user.password.startsWith("$2b$") ? await bcrypt.compare(password, user.password) : (password === user.password);
+    
+    // ➡️ ပြင်ဆင်ချက်: result အစား results လို့ သုံးပြီး err handling ထည့်သွင်းထားသည်
+    db.query("SELECT * FROM users WHERE email = ?", [email], async (err, results) => {
+        if (err) {
+            console.error("Database Error (Login):", err);
+            return res.render("login", { error: "Database ချိတ်ဆက်မှု Error တက်နေပါသည်။" });
+        }
 
-        if (isMatch) {
-            let userRole = (user.email === 'admin@gmail.com') ? 'admin' : 'user';
-            req.session.user = { id: user.id, name: user.name, email: user.email, role: userRole };
-            return (userRole === 'admin') ? res.redirect("/admin") : res.redirect("/home");
-        } else {
-            return res.render("login", { error: "Email သို့မဟုတ် Password မှားနေပါတယ်။" });
+        // mysql2 အတွက် results ရှိမရှိနှင့် အကောင့် ရှိမရှိ သေချာအောင် စစ်ဆေးခြင်း
+        if (!results || results.length === 0) { 
+            return res.render("login", { error: "Email သို့မဟုတ် Password မှားနေပါတယ်။" }); 
+        }
+
+        const user = results[0];
+        
+        try {
+            // သင့်ရဲ့ မူရင်း Password တိုက်စစ်တဲ့ logic အတိုင်း ပြန်သုံးထားပါတယ်
+            let isMatch = user.password.startsWith("$2b$") 
+                ? await bcrypt.compare(password, user.password) 
+                : (password === user.password);
+
+            if (isMatch) {
+                let userRole = (user.email === 'admin@gmail.com') ? 'admin' : 'user';
+                req.session.user = { id: user.id, name: user.name, email: user.email, role: userRole };
+                
+                return (userRole === 'admin') ? res.redirect("/admin") : res.redirect("/home");
+            } else {
+                return res.render("login", { error: "Email သို့မဟုတ် Password မှားနေပါတယ်။" });
+            }
+        } catch (bcryptErr) {
+            console.error("Bcrypt Verification Error:", bcryptErr);
+            return res.render("login", { error: "စနစ်ချို့ယွင်းချက်ရှိပါသည်။ ခဏနေမှ ပြန်စမ်းပါ။" });
         }
     });
 });
-
 app.get("/logout", (req, res) => { req.session.destroy(() => res.redirect("/login")); });
 
 // ================= ၇။ OTP SYSTEM API ROUTES (FOR POSTMAN & ANDROID STUDIO) =================
