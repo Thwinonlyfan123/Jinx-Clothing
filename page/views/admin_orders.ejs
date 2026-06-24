@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Order Management</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; 
+            background: #ffffff; 
+            color: #222222; 
+            padding: 60px 40px; 
+        }
+        h1 {
+            color: #111111;
+            font-size: 26px;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+        .back-link {
+            display: inline-block;
+            color: #777777;
+            text-decoration: none;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 30px;
+            transition: color 0.2s ease;
+        }
+        .back-link:hover {
+            color: #111111;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px; 
+            background: #ffffff; 
+            border: 1px solid #e5e5e5;
+        }
+        th, td { 
+            padding: 16px; 
+            border-bottom: 1px solid #f0f0f0; 
+            text-align: left; 
+            font-size: 14px;
+        }
+        th { 
+            background-color: #fafafa; 
+            color: #111111; 
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 12px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        tr:hover { 
+            background-color: #fafafa; 
+        }
+        .badge { 
+            padding: 4px 10px; 
+            border-radius: 0px; 
+            font-size: 11px; 
+            font-weight: 500; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+        }
+        .badge-kpay { 
+            background: #ffffff; 
+            color: #111111; 
+            border: 1px solid #111111;
+        }
+        .badge-cod { 
+            background: #f5f5f5; 
+            color: #666666; 
+            border: 1px solid #e5e5e5;
+        }
+        .ss-img { 
+            width: 60px; 
+            height: 75px; 
+            object-fit: cover;
+            border-radius: 0px; 
+            border: 1px solid #e5e5e5;
+            cursor: pointer; 
+            transition: transform 0.2s ease, box-shadow 0.2s ease; 
+            background: #fafafa;
+        }
+        .ss-img:hover { 
+            transform: scale(2.5); 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            position: relative;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🛒 Sales & Order Records</h1>
+    <a href="/admin" class="back-link">← Back to Product Admin</a>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Phone</th>
+                <th>Shipping Address</th>
+                <th>Payment Method</th>
+                <th>Total Amount</th>
+                <th>Payment Screenshot</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% orders.forEach(order => { %>
+                <tr>
+                    <td style="color: #777777;">#<%= order.id %></td>
+                    <td><strong><%= order.customer_name %></strong></td>
+                    <td><%= order.phone_number %></td>
+                    <td style="color: #555555; max-width: 250px; line-height: 1.4;"><%= order.shipping_address %></td>
+                    <td>
+                        <% if(order.payment_method === 'KPay' || order.payment_method === 'WavePay') { %>
+                            <span class="badge badge-kpay">💳 <%= order.payment_method %></span>
+                        <% } else { %>
+                            <span class="badge badge-cod">💵 <%= order.payment_method %></span>
+                        <% } %>
+                    </td>
+                    <td style="color: #111111; font-weight: 500;">$<%= order.total_amount %></td>
+                    <td>
+                        <% if(order.payment_screenshot) { %>
+                            <a href="/<%= order.payment_screenshot %>" target="_blank">
+                                <img src="/<%= order.payment_screenshot %>" class="ss-img" alt="Screenshot">
+                            </a>
+                        <% } else { %>
+                            <span style="color: #999999; font-size: 13px;">No attachment (COD)</span>
+                        <% } %>
+                    </td>
+                    <td style="color: #777777; font-size: 13px;"><%= new Date(order.created_at).toLocaleString() %></td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+
+</body>
+</html>

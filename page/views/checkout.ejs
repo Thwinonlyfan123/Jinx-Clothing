@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Checkout - Jinx Clothing</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; 
+            background: #ffffff; 
+            color: #222222; 
+            padding: 60px 40px; 
+        }
+        .checkout-container { 
+            background: #ffffff; 
+            border: 1px solid #e5e5e5; 
+            padding: 40px; 
+            max-width: 500px; 
+            margin: auto; 
+            border-radius: 0px; 
+        }
+        h2 {
+            font-size: 22px;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #111111;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        input, textarea, select { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 8px 0 24px 0; 
+            background: #fafafa; 
+            border: 1px solid #e5e5e5; 
+            color: #222222; 
+            border-radius: 0px; 
+            box-sizing: border-box; 
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: #999999;
+            background: #ffffff;
+            outline: none;
+        }
+        label { 
+            font-weight: 400; 
+            font-size: 13px; 
+            color: #444444; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .btn { 
+            width: 100%; 
+            background-color: #111111; 
+            color: white; 
+            padding: 14px; 
+            border: none; 
+            border-radius: 0px; 
+            font-size: 13px; 
+            font-weight: 500; 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer; 
+            margin-top: 10px; 
+            transition: background 0.2s ease;
+        }
+        .btn:hover { 
+            background-color: #444444; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="checkout-container">
+        <h2>🛍️ Checkout Information</h2>
+        <hr style="border: 0; border-top: 1px solid #f0f0f0; margin-bottom: 24px;">
+        
+        <p style="font-size: 16px; margin-bottom: 24px; color: #444444;">
+            <strong>Total Amount:</strong> 
+            <span style="color: #111111; font-weight: 600; margin-left: 5px;">$<%= total_amount %></span>
+        </p>
+        
+        <form action="/place-order" method="POST" enctype="multipart/form-data">
+            
+            <input type="hidden" name="total_amount" value="<%= total_amount %>">
+
+            <label for="customer_name">Customer Name:</label>
+            <input type="text" id="customer_name" name="customer_name" placeholder="Enter your full name" required>
+
+            <label for="phone_number">Contact Phone Number:</label>
+            <input type="tel" id="phone_number" name="phone_number" placeholder="e.g. 09123456789" required>
+
+            <label for="shipping_address">Delivery Address:</label>
+            <textarea id="shipping_address" name="shipping_address" rows="3" placeholder="Apartment, Street, Township, City" required></textarea>
+
+            <label for="paymentMethod">Select Payment Method:</label>
+            <select name="payment_method" id="paymentMethod" onchange="toggleScreenshotInput()">
+                <option value="COD">Cash on Delivery (COD)</option>
+                <option value="Kpay">Kpay</option>
+                <option value="WavePay">WavePay</option>
+            </select>
+
+            <div id="screenshotSection" style="display:none; margin-top: 5px; margin-bottom: 24px; background: #fffbeb; padding: 20px; border: 1px solid #fef3c7;">
+                <label style="color: #b45309; display: block; margin-bottom: 10px; font-weight: 500; font-size: 12px;">⚠️ Please upload payment transaction screenshot:</label>
+                <input type="file" name="screenshot" accept="image/*" id="screenshotInput" style="margin-bottom: 0; background: #ffffff;">
+            </div>
+
+            <button type="submit" class="btn">Place Order</button>
+        </form>
+    </div>
+
+    <script>
+    function toggleScreenshotInput() {
+        var method = document.getElementById("paymentMethod").value;
+        var section = document.getElementById("screenshotSection");
+        var screenshotInput = document.getElementById("screenshotInput");
+        
+        if (method === "Kpay" || method === "WavePay") {
+            section.style.display = "block";
+            screenshotInput.required = true; 
+        } else {
+            section.style.display = "none";
+            screenshotInput.required = false; 
+            screenshotInput.value = ""; 
+        }
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Jinx Clothing</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background: #ffffff;
+            color: #222222;
+            padding: 60px 40px;
+        }
+
+        h1,
+        h2 {
+            color: #111111;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            font-size: 26px;
+            margin-bottom: 24px;
+        }
+
+        h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            margin-top: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        form {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 0px;
+            margin-bottom: 50px;
+            border: 1px solid #e5e5e5;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #444444;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 0px;
+            border: 1px solid #e5e5e5;
+            background: #fafafa;
+            color: #222222;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: #999999;
+            background: #ffffff;
+            outline: none;
+        }
+
+        .btn {
+            background: #111111;
+            color: white;
+            padding: 12px 24px;
+            border: 1px solid #111111;
+            border-radius: 0px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-block;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: transparent;
+            color: #111111;
+        }
+
+        .btn-danger {
+            background: transparent;
+            border: 1px solid #e5e5e5;
+            color: #cc3333;
+        }
+
+        .btn-danger:hover {
+            background: #fdf2f2;
+            border-color: #cc3333;
+            color: #cc3333;
+        }
+
+        .btn-success {
+            background: #111111;
+            color: white;
+            border-color: #111111;
+        }
+
+        .btn-success:hover {
+            background: #444444;
+            color: white;
+        }
+
+        .btn-warning {
+            background: transparent;
+            border: 1px solid #e5e5e5;
+            color: #aa7700;
+        }
+
+        .btn-warning:hover {
+            background: #fffbeb;
+            border-color: #aa7700;
+            color: #aa7700;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: #ffffff;
+            border: 1px solid #e5e5e5;
+            border-radius: 0px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+
+        th {
+            background: #fafafa;
+            color: #111111;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 12px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        img {
+            border-radius: 0px;
+            object-fit: cover;
+            background: #fafafa;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🛠️ Admin Management Panel</h1>
+        
+        <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+            <a href="/list" class="btn" style="background:transparent; border-color:#e5e5e5; color:#555555;">🏠 View Store Front</a>
+            <a href="/admin/orders" class="btn btn-warning">🛍️ View User Orders & Screenshots</a>
+        </div>
+        
+        <hr style="margin: 30px 0; border: 0; border-top: 1px solid #f0f0f0;">
+
+        <h2>➕ Add New Product</h2>
+        <form action="/admin/add" method="POST">
+            <div class="form-group">
+                <label>Product Name</label>
+                <input type="text" name="name" required placeholder="e.g. Luxury Denim Jacket">
+            </div>
+            <div class="form-group">
+                <label>Price ($)</label>
+                <input type="number" step="0.01" name="price" required placeholder="e.g. 49.99">
+            </div>
+            <div class="form-group">
+                <label>Image Filename (e.g. c1.jpg)</label>
+                <input type="text" name="image" required placeholder="Must match file inside photo directory">
+            </div>
+            <button type="submit" class="btn btn-success">Save Product</button>
+        </form>
+
+        <h2>📦 Existing Products</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% products.forEach(product=> { %>
+                    <tr>
+                        <td><img src="/<%= product.image %>" width="50" height="60"></td>
+                        <td><strong><%= product.name %></strong></td>
+                        <td><span style="color:#111111; font-weight:500;">$<%= product.price %></span></td>
+                        <td class="actions">
+                            <a href="/admin/edit/<%= product.id %>" class="btn" style="padding: 8px 16px;">Edit</a>
+                            <a href="/admin/delete/<%= product.id %>" class="btn btn-danger" style="padding: 8px 16px;"
+                                onclick="return confirm('Are you sure you want to permanently delete this product?')">Delete</a>
+                        </td>
+                    </tr>
+                    <% }) %>
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>

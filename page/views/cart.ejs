@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>My Cart - Jinx Clothing</title>
+<style>
+    body { 
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; 
+        background: #ffffff; 
+        color: #222222; 
+        padding: 60px 40px;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    h1 { 
+        color: #111111; 
+        font-size: 28px;
+        font-weight: 300;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 30px;
+    }
+    .back-btn { 
+        display: inline-block; 
+        background: transparent; 
+        color: #555555; 
+        padding: 10px 20px; 
+        border: 1px solid #e5e5e5;
+        text-decoration: none; 
+        margin-bottom: 30px; 
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.2s ease;
+    }
+    .back-btn:hover {
+        border-color: #111111;
+        color: #111111;
+    }
+    .cart-item { 
+        border-bottom: 1px solid #f0f0f0; 
+        background: #ffffff; 
+        margin: 0; 
+        padding: 24px 0; 
+        display: flex; 
+        align-items: center; 
+        gap: 24px; 
+    }
+    .cart-item img { 
+        border-radius: 0px; 
+        object-fit: cover; 
+        background: #fafafa;
+    }
+    .item-details { 
+        flex-grow: 1; 
+    }
+    .item-details h3 {
+        font-size: 16px;
+        font-weight: 400;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #111111;
+        margin-bottom: 6px;
+    }
+    .item-details p {
+        font-size: 14px;
+        color: #666666;
+        margin-bottom: 4px;
+    }
+    .action-links {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .action-links a { 
+        color: #111111; 
+        background: #ffffff; 
+        border: 1px solid #e5e5e5;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none; 
+        font-weight: 500; 
+        transition: all 0.2s ease;
+    }
+    .action-links a:hover {
+        border-color: #111111;
+    }
+    .action-links a.delete { 
+        background: transparent; 
+        border: 1px solid #e5e5e5;
+        color: #cc3333;
+        width: auto;
+        padding: 0 14px;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        height: 32px;
+    }
+    .action-links a.delete:hover {
+        border-color: #cc3333;
+        background: #fdf2f2;
+    }
+    .total-section { 
+        margin-top: 40px; 
+        padding: 30px; 
+        background: #faf9f6; /* Soft natural bone white */
+        border-radius: 0px; 
+        display: block; 
+        float: right;
+        width: 100%; 
+        max-width: 360px; 
+        box-sizing: border-box; 
+    }
+    .total-section h2 {
+        font-size: 18px;
+        font-weight: 400;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #111111;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #e5e5e5;
+        padding-bottom: 12px;
+    }
+</style>
+</head>
+<body>
+
+<h1>🛒 Shopping Cart</h1>
+<a href="/list" class="back-btn">⬅️ Back to Store</a>
+
+<% let total = 0; %>
+
+<% if (carts.length === 0) { %>
+    <p style="color: #777777; font-size: 15px; padding: 20px 0;">Your cart is empty.</p>
+<% } else { %>
+    <% carts.forEach(item => { %>
+        <% total += item.price * item.quantity; %>
+
+        <div class="cart-item">
+            <img src="/<%= item.image %>" width="80" height="100">
+            <div class="item-details">
+                <h3><%= item.name %></h3>
+                <p style="color: #111111; font-weight: 500;">Price: $<%= item.price %></p>
+                <p>Quantity: <%= item.quantity %></p>
+                <p style="color: #777777; font-size: 13px;">Subtotal: $<%= (item.price * item.quantity).toFixed(2) %></p>
+            </div>
+
+            <div class="action-links">
+                <a href="/cart/decrease/<%= item.id %>">-</a>
+                <a href="/cart/increase/<%= item.id %>">+</a>
+                <a href="/cart/delete/<%= item.id %>" class="delete" onclick="return confirm('Are you sure you want to remove this item?')">Delete</a>
+            </div>
+        </div>
+    <% }) %> 
+    
+    <div class="total-section">
+        <h2>Total Amount: $<%= total.toFixed(2) %></h2>
+        
+        <div style="margin-top: 15px;">
+            <a href="/checkout" style="display: inline-block; background: #111111; color: white; padding: 14px 24px; text-decoration: none; font-weight: 500; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; text-align: center; width: 100%; box-sizing: border-box; transition: background 0.2s ease;">
+                Proceed to Checkout
+            </a>
+        </div>
+    </div>
+<% } %> 
+
+</body>
+</html>

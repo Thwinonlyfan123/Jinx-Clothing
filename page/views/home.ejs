@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jinx Clothing</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+body {
+    background: #ffffff;
+    color: #222222;
+}
+
+/* NAVBAR - Soft White & Elegant */
+nav{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px 60px;
+    background:#ffffff;
+    color:#111111;
+    border-bottom: 1px solid #f0f0f0;
+    position:sticky;
+    top:0;
+    z-index:1000;
+}
+
+.logo{
+    font-size:18px;
+    font-weight:400;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+.nav-links{
+    display:flex;
+    gap:30px;
+}
+
+.nav-links a{
+    color:#555555;
+    text-decoration:none;
+    font-size:13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: color 0.2s ease;
+}
+
+.nav-links a:hover{
+    color:#111111;
+}
+
+.icons{
+    display:flex;
+    gap:20px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+.icons a {
+    text-decoration: none;
+    color: #111111;
+    transition: opacity 0.2s ease;
+}
+
+.icons a:hover {
+    opacity: 0.6;
+}
+
+/* HERO - Clean Organic Tone */
+.hero{
+    height:75vh;
+    background:linear-gradient(rgba(255,255,255,0.05), rgba(255,255,255,0.05)), url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1500') center/cover;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:#111111;
+    text-align:center;
+}
+
+.hero h1{
+    font-size:42px;
+    font-weight: 300;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+.hero button{
+    margin-top:10px;
+    padding:14px 32px;
+    border:1px solid #111111;
+    background:#111111;
+    color:#ffffff;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor:pointer;
+    transition: all 0.2s ease;
+}
+
+.hero button:hover{
+    background: transparent;
+    color: #111111;
+}
+
+/* PRODUCTS */
+.products{
+    padding:80px 60px;
+    max-width: 1300px;
+    margin: 0 auto;
+    text-align:center;
+}
+
+.products h2 {
+    font-size: 24px;
+    font-weight: 300;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 40px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:30px;
+    margin-top:30px;
+}
+
+.card{
+    background:#fff;
+    padding-bottom:10px;
+    text-align: left;
+}
+
+.card img{
+    width:100%;
+    height: 360px;
+    object-fit: cover;
+    border-radius:0px;
+    margin-bottom: 14px;
+    transition: transform 0.3s ease;
+    background: #fafafa;
+}
+
+.card:hover img {
+    transform: scale(1.02);
+}
+
+.card h4 {
+    font-size: 14px;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #333333;
+    margin-bottom: 4px;
+}
+
+.card p{
+    font-size: 14px;
+    color:#777777;
+    margin-bottom:12px;
+}
+
+.card button{
+    margin-top:5px;
+    padding:12px;
+    width:100%;
+    background:transparent;
+    color:#111111;
+    border:1px solid #e5e5e5;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 11px;
+    cursor:pointer;
+    transition: all 0.2s ease;
+}
+
+.card button:hover{
+    border-color: #111111;
+    background: #111111;
+    color: #ffffff;
+}
+
+/* ABOUT */
+.about{
+    padding:90px 40px;
+    background:#faf9f6; /* Soft bone/linen white */
+    text-align:center;
+}
+
+.about h2 {
+    font-size: 24px;
+    font-weight: 300;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+}
+
+.about p {
+    max-width: 650px;
+    margin: 0 auto;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #555555;
+}
+
+/* CONTACT */
+.contact{
+    padding:80px 40px;
+    text-align:center;
+    max-width: 450px;
+    margin: 0 auto;
+}
+
+.contact h2 {
+    font-size: 24px;
+    font-weight: 300;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+}
+
+.contact input,
+.contact textarea{
+    width:100%;
+    padding:14px;
+    margin-bottom:14px;
+    border:1px solid #e5e5e5;
+    background:#fafafa;
+    font-size:14px;
+    outline:none;
+    transition: border-color 0.2s ease;
+}
+
+.contact input:focus,
+.contact textarea:focus {
+    border-color: #999999;
+    background: #ffffff;
+}
+
+/* FOOTER */
+footer{
+    background:#ffffff;
+    color:#888888;
+    text-align:center;
+    padding:40px 20px;
+    font-size: 13px;
+    border-top: 1px solid #f0f0f0;
+    letter-spacing: 0.5px;
+}
+
+/* 📱 MOBILE */
+@media(max-width:768px){
+    nav{
+        flex-direction:column;
+        gap:15px;
+        padding:20px;
+        text-align:center;
+    }
+
+    .grid{
+        grid-template-columns:1fr;
+        gap: 40px;
+    }
+
+    .hero h1{
+        font-size:28px;
+    }
+}
+
+/* 📟 TABLET */
+@media(min-width:769px) and (max-width:1024px){
+    .grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+}
+</style>
+</head>
+
+<body >
+
+<nav>
+    <div class="logo">Jinx Clothing</div>
+
+    <div class="nav-links">
+        <a href="#">Home</a>
+        <a href="/list">Products</a>
+        <a href="/about">About</a>
+        <a href="/contact">Contact</a>
+    </div>
+
+   
+</nav>
+
+<section class="hero">
+    <div>
+        <h1>Natural Essentials</h1>
+        <button onclick="document.getElementById('products').scrollIntoView({behavior: 'smooth'})">Shop Now</button>
+    </div>
+</section>
+
+<section class="products" id="products">
+    <h2>Our Products</h2>
+
+    <div class="grid">
+
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1520975958225-0d3c4d4b0c3f">
+            <h4>Street Hoodie</h4>
+            <p>$25</p>
+            <button>Add to Cart</button>
+        </div>
+
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1521335629791-ce4aec67dd49">
+            <h4>Classic Shirt</h4>
+            <p>$18</p>
+            <button>Add to Cart</button>
+        </div>
+
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1520975682031-a1d9c2d9b3d2">
+            <h4>Casual Jacket</h4>
+            <p>$35</p>
+            <button>Add to Cart</button>
+        </div>
+
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1521334884684-d80222895322">
+            <h4>Urban Tee</h4>
+            <p>$12</p>
+            <button>Add to Cart</button>
+        </div>
+
+    </div>
+</section>
+
+<section class="about" id="about">
+    <h2>About Us</h2>
+    <p>
+        We are a modern clothing brand focused on streetwear, comfort, and style.
+        Our mission is to bring high-quality fashion at affordable prices.
+    </p>
+</section>
+
+<section class="contact" id="contact">
+    <h2>Contact Us</h2>
+    <input type="text" placeholder="Your Name">
+    <input type="email" placeholder="Your Email">
+    <textarea rows="4" placeholder="Message"></textarea>
+    <button style="padding:14px; background:#111111; color:white; border:none; width:100%; text-transform:uppercase; letter-spacing:1px; font-size:13px; cursor:pointer;">
+        Send
+    </button>
+</section>
+
+<footer>
+    © 2026 Jinx Clothing | All Rights Reserved
+</footer>
+
+</body>
+</html>
