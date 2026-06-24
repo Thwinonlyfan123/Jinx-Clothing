@@ -35,13 +35,18 @@ app.use(session({
 // ================= ၄။ DATABASE CONNECTION =================
 const db = mysql.createPool({
     host: process.env.DB_HOST,
-    port: process.env.DB_PORT || 3306,
+    port: process.env.DB_PORT,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
+    
+    // ➡️ ဒီစာသား ၃ ကြောင်းကို ကော်ပီကူးပြီး သေချာထည့်ပေးပါဗျာ (Aiven အတွက် အဓိက လိုအပ်ချက်ပါ)
     ssl: {
         rejectUnauthorized: false
-    }
+    },
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
 // ================= ၅။ ADMIN စစ်ဆေးသည့်ဂိတ် =================
